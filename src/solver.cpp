@@ -51,7 +51,7 @@ class Solver
 public:
     std::vector<VerletObject *> objects;
     sf::Vector2f gravity{0, 500};
-    int sub_steps = 4;
+    int sub_steps = 3;
     int grid_size = 50;
     int grid_depth = 12;
     int windows_w;
@@ -79,7 +79,6 @@ public:
         VerletObject *n_object = new VerletObject(position, position_last, radius, id, color);
         objects.push_back(n_object);
 
-        //Add new object to the grid
         grid->add_object(id, position.x / grid_size, position.y / grid_size);
     }
 
@@ -125,47 +124,34 @@ private:
         {
             for (int j = 0; j < h_grid; j++)
             {
-                int *cell = grid->get_cell(i, j);
-                for (int k = grid_depth * 4; k < grid_depth * 5; k++)
+                int *c_cell = grid->get_cell(i, j);
+
+                int *c_block = grid->get_cell_block(i, j);
+                for (int k = 0; k < grid_depth; k++)
                 {
-                    if (cell[k] == -1)
+                    if (c_cell[k] == -1)
                         continue;
                     for (int l = 0; l < grid_depth * 9; l++)
                     {
-                        if (cell[l] == -1 or cell[k] == cell[l])
+                        if (c_cell[k] == c_block[l])
                             continue;
+                        if (c_block[l] == -1)
+                            break;
 
-                        auto object1 = objects[cell[k] - 1];
-                        auto object2 = objects[cell[l] - 1];
+                        auto object1 = objects[c_cell[k] - 1];
+                        auto object2 = objects[c_block[l] - 1];
+
                         sf::Vector2f dir = object1->position - object2->position;
                         float dist = sqrt(dir.x * dir.x + dir.y * dir.y);
                         if (dist < object1->radius + object2->radius)
                         {
                             float dist_back = (dist - (object1->radius + object2->radius)) / 2;
-                            object1->position = object1->position - (dir / dist) * 0.1f * dist_back;
-                            object2->position = object2->position + (dir / dist) * 0.1f * dist_back;
+                            object1->position = object1->position - (dir / dist) * 0.2f * dist_back;
+                            object2->position = object2->position + (dir / dist) * 0.2f * dist_back;
                         }
                     }
                 }
             }
         }
-
-        // for (auto &object1 : objects)
-        // {
-        //     for (auto &object2 : objects)
-        //     {
-        //         if (object1->id == object2->id || abs(object1->grid_x - object2->grid_x) > 1 || abs(object1->grid_y - object2->grid_y) > 1)
-        //             continue;
-
-        //         // sf::Vector2f dir = object1->position - object2->position;
-        //         // float dist = sqrt(dir.x * dir.x + dir.y * dir.y);
-        //         // if (dist < object1->radius + object2->radius)
-        //         // {
-        //         //     float dist_back = (dist - (object1->radius + object2->radius)) / 2;
-        //         //     object1->position = object1->position - (dir / dist) * 0.2f * dist_back;
-        //         //     object2->position = object2->position + (dir / dist) * 0.2f * dist_back;
-        //         // }
-        //     }
-        // }
     }
 };

@@ -100,20 +100,11 @@ int main()
         render_time = duration_cast<microseconds>(solver_time - solver_time);
         duration = duration_cast<microseconds>(end - beg);
 
-        if (duration.count() < 1000000.0 / 30)
-        {
-            usleep(1000000.0 / 30 - duration.count());
-        }
-        else
-        {
-            std::cout << circle_idx << std::endl;
-            //break;
-        }
-
         duration = duration_cast<microseconds>(end - last_spawn);
-        if (duration.count() / 1000 > 50)
+        if (duration.count() / 1000 > 50 && circle_idx < 3000)
         {
-            solver.add_object(sf::Vector2f(800, 400), sf::Vector2f(798, 400), 10, sf::Color(rand() % 240 + 15, rand() % 240 + 15, rand() % 240 + 15), circle_idx++);
+            solver.add_object(sf::Vector2f(800, 400), sf::Vector2f(798, 400), 10, sf::Color(rand() % 205 + 50, rand() % 205 + 50, rand() % 205 + 50), circle_idx++);
+            solver.add_object(sf::Vector2f(900, 400), sf::Vector2f(898, 400), 10, sf::Color(rand() % 205 + 50, rand() % 205 + 50, rand() % 205 + 50), circle_idx++);
             last_spawn = high_resolution_clock::now();
         }
     }
